@@ -209,6 +209,48 @@ class Livro {
             return null;
         }
     }
+
+    /**
+     * Cadastra um novo livro no banco de dados
+     * @param livro Objeto Livro contendo as informações a serem cadastradas
+     * @returns Boolean indicando se o cadastro foi bem-sucedido
+     */
+    static async cadastrarLivro(livro: Livro): Promise<boolean> {
+        try {
+            // Cria a consulta (query) para inserir livro na tabela retornado o ID do livro
+            const queryInsertLivro = `
+                INSERT INTO Livro (titulo, autor, editora, ano_publicacao, isbn, quant_total, quant_disponivel, valor_aquisicao, status_livro_emprestado)
+                VALUES (
+                    '${livro.getTitulo().toUpperCase()}',
+                    '${livro.getAutor().toUpperCase()}',
+                    '${livro.getEditora().toUpperCase()}',
+                    '${livro.getAnoPublicacao().toUpperCase()}',
+                    '${livro.getIsbn().toUpperCase()}',
+                    '${livro.getQuantTotal()}',
+                    '${livro.getQuantDisponivel()}',
+                    '${livro.getValorAquisicao()}',
+                    '${livro.getStatusLivroEmprestado().toUpperCase()}'
+                )
+                RETURNING id_livro;`;
+
+            // executa a consulta no banco e armazena o resultado
+            const result = await database.query(queryInsertLivro);
+
+            // verifica se o número de linhas alteradas no banco de dados é maior que 0
+            if (result.rows.length > 0) {
+                // exibe mensagem de sucesso no console
+                console.log(`Livro cadastrado com sucesso. ID: ${result.rows[0].id_livro}`);
+                // altera o valor da variável de controle para verdadeiro
+                return true;
+            }
+
+            return false;
+            // captura qualquer tipo de erro que possa acontecer
+        } catch (error) {
+            console.error(`Erro ao cadastrar livro: ${error}`);
+            return false;
+        }
+    }
 }
 
 export default Livro;
