@@ -59,13 +59,44 @@ class EmprestimoController extends Emprestimo {
 
             if (result) {
                 // Retorna a resposta de sucesso com o ID do novo empréstimo
-                return res.status(201).json({ mensagem: 'Empréstimo cadastrado com sucesso.'});
+                return res.status(201).json({ mensagem: 'Empréstimo cadastrado com sucesso.' });
             } else {
                 return res.status(500).json({ mensagem: 'Não foi possível cadastrar o livro no banco de dados.' });
             }
         } catch (error) {
             console.error('Erro ao cadastrar empréstimo:', error);
             return res.status(500).json({ mensagem: 'Erro ao cadastrar o empréstimo.' });
+        }
+    }
+
+    /**
+     * Atualiza um empréstimo existente.
+     * Recebe os dados do empréstimo a partir da requisição e passa para o serviço.
+     */
+    static async atualizar(req: Request, res: Response): Promise<Response> {
+        try {
+            const dadosRecebidos: EmprestimoDTO = req.body;
+            const idEmprestimo = parseInt(req.params.id as string);
+
+            // Chama o MODEL para atualizar o empréstimo/ Number(idEmprestimo) converte o idEmprestimo de string para number
+            const result = await Emprestimo.atualizarEmprestimo(
+                idEmprestimo,
+                dadosRecebidos.aluno.id_aluno,
+                dadosRecebidos.livro.id_livro,
+                new Date(dadosRecebidos.data_emprestimo),
+                dadosRecebidos.data_devolucao ? new Date(dadosRecebidos.data_devolucao) : new Date(),
+                dadosRecebidos.status_emprestimo ?? ""
+            );
+
+            if (result) {
+                // Retorna a resposta de sucesso com o ID do empréstimo atualizado
+                return res.status(200).json({ mensagem: 'Empréstimo atualizado com sucesso.' });
+            } else {
+                return res.status(500).json({ mensagem: 'Não foi possível cadastrar o livro no banco de dados.' });
+            }
+        } catch (error) {
+            console.error('Erro ao atualizar empréstimo:', error);
+            return res.status(500).json({ mensagem: 'Erro ao atualizar o empréstimo.' });
         }
     }
 }
