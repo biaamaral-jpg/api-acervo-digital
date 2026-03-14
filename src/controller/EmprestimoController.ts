@@ -99,6 +99,39 @@ class EmprestimoController extends Emprestimo {
             return res.status(500).json({ mensagem: 'Erro ao atualizar o empréstimo.' });
         }
     }
+
+    /**
+    * Método para remover um empréstimo do banco de dados
+    * 
+    * @param req Objeto de requisição HTTP com o ID do aluno a ser removido.
+    * @param res Objeto de resposta HTTP.
+    * @returns Mensagem de sucesso ou erro em formato JSON.
+    */
+    static async remover(req: Request, res: Response): Promise<Response> {
+        // tenta executar a remoção do registro
+        try {
+            // id do empréstimo vindo do cliente
+            const idEmprestimo = parseInt(req.params.id as string);
+            // executa o método de remoção e armazena o resultado (booleano)
+            const resultado = await Emprestimo.removerEmprestimo(idEmprestimo);
+
+            // se o resultdo for true
+            if (resultado) {
+                // retorna mensagem e sucesso com status 200
+                return res.status(200).json({ mensagem: 'Empréstimo removido com sucesso!' });
+            } else {
+                // retorna mensagem de erro com status 
+                return res.status(500).json({ mensagem: 'Erro ao remover empréstimo!' });
+            }
+
+            // captura qualquer erro que possa acontecer
+        } catch (error) {
+            // exibe detalhes do erro no console
+            console.log(`Erro ao remover o Empréstimo ${error}`);
+            // retorna uma mensagem de erro com status 500
+            return res.status(500).json({ mensagem: "Erro ao remover empréstimo." });
+        }
+    }
 }
 
 export default EmprestimoController;
